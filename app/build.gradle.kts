@@ -22,6 +22,7 @@ dependencies {
     implementation("org.slf4j:slf4j-simple:2.0.17")
     implementation("io.javalin:javalin:6.5.0")
     implementation("io.javalin:javalin-rendering:6.5.0")
+    implementation("com.zaxxer:HikariCP:6.3.0")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.12.0")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
