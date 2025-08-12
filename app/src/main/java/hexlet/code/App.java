@@ -63,8 +63,7 @@ public class App {
         try (Connection connection = dataSource.getConnection()) {
             connection.createStatement().execute(readSchemaDB());
         } catch (SQLException error) {
-            log.error("Ошибка инициализации базы данных", error);
-            throw error;
+            throw new SQLException("Ошибка инициализации базы данных", error);
         }
 
         BaseRepository.setDataSource(dataSource);
@@ -81,7 +80,7 @@ public class App {
                 .lines()
                 .collect(Collectors.joining());
         }
-    }    
+    }
 
     private static TemplateEngine createTemplateEngine() {
         Path path = Path.of("app", "src", "main", "resources", "templates");

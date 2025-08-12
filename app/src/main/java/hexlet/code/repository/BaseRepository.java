@@ -5,8 +5,8 @@ import com.zaxxer.hikari.HikariDataSource;
 public class BaseRepository {
     private static HikariDataSource dataSource;
 
-    public static void setDataSource(HikariDataSource dataSource) {
-        BaseRepository.dataSource = dataSource;
+    public static void setDataSource(HikariDataSource newDataSource) {
+        BaseRepository.dataSource = newDataSource;
     }
 
     public static HikariDataSource getDataSource() {
