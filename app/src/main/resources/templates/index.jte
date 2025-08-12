@@ -1,32 +1,17 @@
-<html lang="ru">
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <title>Анализатор страниц</title>
-</head>
-<body class="h-dvh flex flex-col">
-    <header class="flex bg-gray-700 p-2">
-        <div class="flex justify-start items-center">
-            <p class="text-white text-2xl mr-4">Анализатор страниц</p>
-            <nav class="flex justify-center items-center gap-2">
-                <a href="/" class="text-gray-400 hover:text-gray-200 text-base">Главная</a>
-                <a href="/urls" class="text-gray-400 hover:text-gray-200 text-base">Сайты</a>
-            </nav>
-        </div>
-    </header>
+@template.layout.page(content = @`
+    <section class="bg-gray-700 p-10">
+        <header class="max-w-4xl m-auto">
+            <h1 class="text-white text-7xl">Анализатор страниц</h1>
+            <p class="text-white text-2xl">Бесплатно проверяйте сайты на SEO пригодность</p>
+        </header>
 
-    <main>
-        <section class="bg-gray-700">
-            <h1>Анализатор страниц</h1>
-            <p>Бесплатно проверяйте сайты на SEO пригодность</p>
-        </section>
-    </main>
+        <form action="/urls" method="post" class="flex flex-wrap items-center justify-between max-w-4xl m-auto">
+            <label for="url-input" class="sr-only">Ссылка</label>
+            <input id="url-input" name="url" type="text" required placeholder="Ссылка" class="bg-white w-3/4 px-5 py-4 rounded-md"/>
 
-    <footer class="bg-gray-200 mt-auto p-2">
-        <div class="flex justify-center items-center">
-            <a href="https://github.com/ArtMan-8" class="underline underline-offset-2 text-blue-600 hover:text-blue-900">@ArtMan-8</a>
-        </div>
-    </footer>
-</body>
-</html>
+            <button type="submit" class="text-white text-lg bg-blue-600 w-1/5 px-4 py-3 rounded-md cursor-pointer hover:bg-blue-700">Проверить</button>
+
+            <p class="text-gray-400 text-base">Пример: https://www.example.com</p>
+        </form>
+    </section>
+`)

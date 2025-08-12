@@ -1,11 +1,10 @@
 package hexlet.code.model;
 
+import java.sql.Timestamp;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.sql.Timestamp;
 
 @Getter
 @Setter
@@ -15,7 +14,7 @@ public class Url {
     private String name;
     private Timestamp createdAt;
 
-    public Url(String urlName) {
-        this.name = urlName;
+    public Url(String name) {
+        this.name = name;
     }
 }
