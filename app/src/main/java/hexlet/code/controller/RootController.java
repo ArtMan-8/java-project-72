@@ -4,13 +4,13 @@ import static io.javalin.rendering.template.TemplateUtil.model;
 import io.javalin.http.Context;
 
 import hexlet.code.dto.BasePage;
-import hexlet.code.util.FlashMassages;
+import hexlet.code.util.FlashMessages;
 
 public class RootController {
     public static void index(Context ctx) {
         var page = new BasePage();
 
-        FlashMassages.setFlashToPage(ctx, page);
+        FlashMessages.setFlashToPage(ctx, page);
 
         ctx.render("index.jte", model("page", page));
     }

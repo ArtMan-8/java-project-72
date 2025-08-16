@@ -7,21 +7,33 @@ import static io.javalin.rendering.template.TemplateUtil.model;
 import java.net.URI;
 import java.net.URL;
 import java.sql.SQLException;
+import java.io.IOException;
 
 import hexlet.code.dto.UrlPage;
 import hexlet.code.dto.UrlsPage;
 import hexlet.code.model.Url;
+import hexlet.code.model.UrlCheck;
 import hexlet.code.repository.UrlRepository;
-import hexlet.code.util.FlashMassages;
+import hexlet.code.service.UrlCheckService;
+import hexlet.code.repository.UrlCheckRepository;
+import hexlet.code.util.FlashMessages;
 import hexlet.code.util.NamedRoutes;
+
+import java.util.Map;
+import java.util.HashMap;
 
 public class UrlsController {
     public static void index(Context ctx) throws SQLException {
         var urls = UrlRepository.getEntities();
-        var page = new UrlsPage(urls);
+        Map<Long, UrlCheck> latestChecks = new HashMap<>();
 
-        FlashMassages.setFlashToPage(ctx, page);
+        for (var url : urls) {
+            var latestCheck = UrlCheckRepository.findLatestByUrlId(url.getId());
+            latestChecks.put(url.getId(), latestCheck.orElse(null));
+        }
 
+        var page = new UrlsPage(urls, latestChecks);
+        FlashMessages.setFlashToPage(ctx, page);
         ctx.render("urls/index.jte", model("page", page));
     }
 
@@ -30,9 +42,10 @@ public class UrlsController {
         var url = UrlRepository.findById(Long.valueOf(urlId));
 
         if (url.isPresent()) {
-            var page = new UrlPage(url.get());
+            var checks = UrlCheckRepository.findByUrlId(Long.valueOf(urlId));
+            var page = new UrlPage(url.get(), checks);
 
-            FlashMassages.setFlashToPage(ctx, page);
+            FlashMessages.setFlashToPage(ctx, page);
 
             ctx.render("urls/show.jte", model("page", page));
         } else {
@@ -44,8 +57,8 @@ public class UrlsController {
         var inputUrl = ctx.formParam("url");
 
         if (inputUrl == null || inputUrl.trim().isEmpty()) {
-            ctx.sessionAttribute(FlashMassages.MESSAGE_KEY, FlashMassages.URL_EMPTY);
-            ctx.sessionAttribute(FlashMassages.TYPE_KEY, FlashMassages.ERROR);
+            ctx.sessionAttribute(FlashMessages.MESSAGE_KEY, FlashMessages.URL_EMPTY);
+            ctx.sessionAttribute(FlashMessages.TYPE_KEY, FlashMessages.ERROR);
             ctx.redirect(NamedRoutes.rootPath());
             return;
         }
@@ -54,8 +67,8 @@ public class UrlsController {
         try {
             url = URI.create(inputUrl).toURL();
         } catch (Exception error) {
-            ctx.sessionAttribute(FlashMassages.MESSAGE_KEY, FlashMassages.URL_INVALID);
-            ctx.sessionAttribute(FlashMassages.TYPE_KEY, FlashMassages.ERROR);
+            ctx.sessionAttribute(FlashMessages.MESSAGE_KEY, FlashMessages.URL_INVALID);
+            ctx.sessionAttribute(FlashMessages.TYPE_KEY, FlashMessages.ERROR);
             ctx.redirect(NamedRoutes.rootPath());
             return;
         }
@@ -68,20 +81,20 @@ public class UrlsController {
 
             var existingUrl = UrlRepository.findByName(domainWithProtocol);
             if (existingUrl.isPresent()) {
-                ctx.sessionAttribute(FlashMassages.MESSAGE_KEY, FlashMassages.URL_ALREADY_EXISTS);
-                ctx.sessionAttribute(FlashMassages.TYPE_KEY, FlashMassages.INFO);
+                ctx.sessionAttribute(FlashMessages.MESSAGE_KEY, FlashMessages.URL_ALREADY_EXISTS);
+                ctx.sessionAttribute(FlashMessages.TYPE_KEY, FlashMessages.INFO);
                 ctx.redirect(NamedRoutes.urlsPath());
                 return;
             }
 
             var newUrl = new Url(domainWithProtocol);
             UrlRepository.save(newUrl);
-            ctx.sessionAttribute(FlashMassages.MESSAGE_KEY, FlashMassages.URL_CREATED);
-            ctx.sessionAttribute(FlashMassages.TYPE_KEY, FlashMassages.SUCCESS);
+            ctx.sessionAttribute(FlashMessages.MESSAGE_KEY, FlashMessages.URL_CREATED);
+            ctx.sessionAttribute(FlashMessages.TYPE_KEY, FlashMessages.SUCCESS);
             ctx.redirect(NamedRoutes.urlsPath());
         } catch (SQLException error) {
-            ctx.sessionAttribute(FlashMassages.MESSAGE_KEY, FlashMassages.URL_ERROR);
-            ctx.sessionAttribute(FlashMassages.TYPE_KEY, FlashMassages.ERROR);
+            ctx.sessionAttribute(FlashMessages.MESSAGE_KEY, FlashMessages.URL_ERROR);
+            ctx.sessionAttribute(FlashMessages.TYPE_KEY, FlashMessages.ERROR);
             ctx.redirect(NamedRoutes.rootPath());
         }
     }
@@ -95,14 +108,21 @@ public class UrlsController {
         }
 
         try {
-            // TODO: Здесь будет логика проверки сайта с использованием Unirest
-            // Пока создаем заглушку для проверки
-            
-            ctx.sessionAttribute(FlashMassages.MESSAGE_KEY, FlashMassages.URL_CHECK_SUCCESS);
-            ctx.sessionAttribute(FlashMassages.TYPE_KEY, FlashMassages.SUCCESS);
+            var urlCheck = UrlCheckService.checkUrl(url.get().getName());
+            urlCheck.setUrlId(Long.valueOf(urlId));
+            UrlCheckRepository.save(urlCheck);
+
+            ctx.sessionAttribute(FlashMessages.MESSAGE_KEY, FlashMessages.URL_CHECK_SUCCESS);
+            ctx.sessionAttribute(FlashMessages.TYPE_KEY, FlashMessages.SUCCESS);
+        } catch (IOException error) {
+            var urlCheck = new UrlCheck(500, "", "", "Ошибка подключения: " + error.getMessage(), Long.valueOf(urlId));
+            UrlCheckRepository.save(urlCheck);
+
+            ctx.sessionAttribute(FlashMessages.MESSAGE_KEY, FlashMessages.URL_CHECK_ERROR);
+            ctx.sessionAttribute(FlashMessages.TYPE_KEY, FlashMessages.ERROR);
         } catch (Exception error) {
-            ctx.sessionAttribute(FlashMassages.MESSAGE_KEY, FlashMassages.URL_CHECK_ERROR);
-            ctx.sessionAttribute(FlashMassages.TYPE_KEY, FlashMassages.ERROR);
+            ctx.sessionAttribute(FlashMessages.MESSAGE_KEY, FlashMessages.URL_CHECK_ERROR);
+            ctx.sessionAttribute(FlashMessages.TYPE_KEY, FlashMessages.ERROR);
         }
 
         ctx.redirect(NamedRoutes.urlPath(urlId));

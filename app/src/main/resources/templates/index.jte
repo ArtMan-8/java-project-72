@@ -2,7 +2,9 @@
 
 @param BasePage page
 
-@template.layout.page(content = @`
+@template.layout.page(
+page = page,
+content = @`
     <section class="bg-gray-700 p-10">
         <header class="max-w-4xl m-auto">
             <h1 class="text-white text-7xl">Анализатор страниц</h1>
@@ -18,4 +20,4 @@
             <p class="text-gray-400 text-base">Пример: https://www.example.com</p>
         </form>
     </section>
-`, page = page)
+`)

@@ -3,8 +3,7 @@ package hexlet.code.util;
 import io.javalin.http.Context;
 import hexlet.code.dto.BasePage;
 
-public class FlashMassages {
-
+public class FlashMessages {
     public static final String TYPE_KEY = "flashType";
     public static final String ERROR = "error";
     public static final String SUCCESS = "success";

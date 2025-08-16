@@ -1,43 +1,52 @@
 package hexlet.code.dto;
 
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
 import hexlet.code.model.Url;
+import hexlet.code.model.UrlCheck;
+import org.junit.jupiter.api.Test;
 
-public final class UrlPageTest {
+import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+class UrlPageTest {
     @Test
     void testUrlPageCreation() {
         var url = new Url("https://example.com");
-        var page = new UrlPage(url);
-        assertNotNull(page);
-        assertEquals(url, page.getUrl());
+        var checks = List.of(
+            new UrlCheck(200, "Test Title", "Test H1", "Test Description", 1L)
+        );
+
+        var page = new UrlPage(url, checks);
+
+        assertThat(page.getUrl()).isEqualTo(url);
+        assertThat(page.getChecks()).hasSize(1);
+        assertThat(page.getChecks().get(0).getStatusCode()).isEqualTo(200);
+        assertThat(page.getChecks().get(0).getTitle()).isEqualTo("Test Title");
     }
 
     @Test
-    void testUrlPageInheritance() {
+    void testUrlPageWithEmptyChecks() {
         var url = new Url("https://example.com");
-        var page = new UrlPage(url);
-        assertTrue(page instanceof BasePage);
+        var checks = List.<UrlCheck>of();
+
+        var page = new UrlPage(url, checks);
+
+        assertThat(page.getUrl()).isEqualTo(url);
+        assertThat(page.getChecks()).isEmpty();
     }
 
     @Test
-    void testUrlPageUrlSetter() {
+    void testUrlPageWithMultipleChecks() {
         var url = new Url("https://example.com");
-        var page = new UrlPage(url);
+        var checks = List.of(
+            new UrlCheck(200, "First Title", "First H1", "First Description", 1L),
+            new UrlCheck(404, "Second Title", "Second H1", "Second Description", 1L)
+        );
 
-        var newUrl = new Url("https://test.com");
-        page.setUrl(newUrl);
-        assertEquals(newUrl, page.getUrl());
-    }
+        var page = new UrlPage(url, checks);
 
-    @Test
-    void testUrlPageUrlNull() {
-        var page = new UrlPage(null);
-        assertNull(page.getUrl());
+        assertThat(page.getChecks()).hasSize(2);
+        assertThat(page.getChecks().get(0).getStatusCode()).isEqualTo(200);
+        assertThat(page.getChecks().get(1).getStatusCode()).isEqualTo(404);
     }
 }

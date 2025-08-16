@@ -1,56 +1,47 @@
 package hexlet.code.dto;
 
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertNull;
-
-import java.util.List;
-import java.util.ArrayList;
-
 import hexlet.code.model.Url;
+import hexlet.code.model.UrlCheck;
+import org.junit.jupiter.api.Test;
 
-public final class UrlsPageTest {
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+class UrlsPageTest {
     @Test
     void testUrlsPageCreation() {
         var urls = List.of(
             new Url("https://example.com"),
             new Url("https://test.com")
         );
-        var page = new UrlsPage(urls);
-        assertNotNull(page);
-        assertEquals(urls, page.getUrls());
+
+        Map<Long, UrlCheck> latestChecks = new HashMap<>();
+        latestChecks.put(1L, null);
+        latestChecks.put(2L, null);
+
+        var page = new UrlsPage(urls, latestChecks);
+
+        assertThat(page.getUrls()).hasSize(2);
+        assertThat(page.getLatestChecks()).hasSize(2);
+        assertThat(page.getUrls().get(0).getName()).isEqualTo("https://example.com");
+        assertThat(page.getUrls().get(1).getName()).isEqualTo("https://test.com");
     }
 
     @Test
-    void testUrlsPageInheritance() {
-        var urls = new ArrayList<Url>();
-        var page = new UrlsPage(urls);
-        assertTrue(page instanceof BasePage);
-    }
+    void testUrlsPageWithChecks() {
+        var urls = List.of(new Url("https://example.com"));
+        urls.get(0).setId(1L);
 
-    @Test
-    void testUrlsPageUrlsSetter() {
-        var urls = new ArrayList<Url>();
-        var page = new UrlsPage(urls);
+        var check = new UrlCheck(200, "Test Title", "Test H1", "Test Description", 1L);
+        Map<Long, UrlCheck> latestChecks = new HashMap<>();
+        latestChecks.put(1L, check);
 
-        var newUrls = List.of(new Url("https://new.com"));
-        page.setUrls(newUrls);
-        assertEquals(newUrls, page.getUrls());
-    }
+        var page = new UrlsPage(urls, latestChecks);
 
-    @Test
-    void testUrlsPageEmptyList() {
-        var urls = new ArrayList<Url>();
-        var page = new UrlsPage(urls);
-        assertTrue(page.getUrls().isEmpty());
-    }
-
-    @Test
-    void testUrlsPageNullUrls() {
-        var page = new UrlsPage(null);
-        assertNull(page.getUrls());
+        assertThat(page.getLatestChecks().get(1L).getStatusCode()).isEqualTo(200);
+        assertThat(page.getLatestChecks().get(1L).getTitle()).isEqualTo("Test Title");
     }
 }

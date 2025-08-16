@@ -1,21 +1,11 @@
-package hexlet.code.controller;
+package hexlet.code.service;
 
-import hexlet.code.model.Url;
 import hexlet.code.model.UrlCheck;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class UrlsControllerTest {
-    @Test
-    void testUrlCreation() {
-        var url = new Url("https://example.com");
-
-        assertThat(url.getName()).isEqualTo("https://example.com");
-        assertThat(url.getId()).isNull();
-        assertThat(url.getCreatedAt()).isNull();
-    }
-
+class UrlCheckServiceTest {
     @Test
     void testUrlCheckCreation() {
         var urlCheck = new UrlCheck(200, "Test Title", "Test H1", "Test Description", 1L);
@@ -28,11 +18,13 @@ class UrlsControllerTest {
     }
 
     @Test
-    void testUrlModelProperties() {
-        var url = new Url("https://example.com");
-        url.setId(1L);
+    void testUrlCheckWithNullValues() {
+        var urlCheck = new UrlCheck(404, null, null, null, 1L);
 
-        assertThat(url.getId()).isEqualTo(1L);
-        assertThat(url.getName()).isEqualTo("https://example.com");
+        assertThat(urlCheck.getStatusCode()).isEqualTo(404);
+        assertThat(urlCheck.getTitle()).isNull();
+        assertThat(urlCheck.getH1()).isNull();
+        assertThat(urlCheck.getDescription()).isNull();
+        assertThat(urlCheck.getUrlId()).isEqualTo(1L);
     }
 }

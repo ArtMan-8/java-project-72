@@ -2,7 +2,9 @@
 
 @param UrlPage page
 
-@template.layout.page(content = @`
+@template.layout.page(
+page = page,
+content = @`
     <section class="p-10">
         <h1 class="text-5xl mb-4">Сайт: ${page.getUrl().getName()}</h1>
 
@@ -54,14 +56,30 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Пока пустая таблица, так как проверки еще не реализованы -->
-                    <tr>
-                        <td colspan="6" class="border border-gray-400 p-2 text-center text-gray-500">
-                            Пока нет проверок
-                        </td>
-                    </tr>
+                    @if(page.getChecks().isEmpty())
+                        <tr>
+                            <td colspan="6" class="border border-gray-400 p-2 text-center text-gray-500">
+                                Пока нет проверок
+                            </td>
+                        </tr>
+                    @else
+                        @for(var check : page.getChecks())
+                            <tr>
+                                <td class="border border-gray-400 p-2">${check.getId()}</td>
+                                <td class="border border-gray-400 p-2">${check.getStatusCode()}</td>
+                                <td class="border border-gray-400 p-2">${check.getTitle()}</td>
+                                <td class="border border-gray-400 p-2">${check.getH1()}</td>
+                                <td class="border border-gray-400 p-2">${check.getDescription()}</td>
+                                <td class="border border-gray-400 p-2">
+                                    @if(check.getCreatedAt() != null)
+                                        ${check.getCreatedAt().toLocalDateTime().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))}
+                                    @endif
+                                </td>
+                            </tr>
+                        @endfor
+                    @endif
                 </tbody>
             </table>
         </div>
     </section>
-`, page = page)
+`)

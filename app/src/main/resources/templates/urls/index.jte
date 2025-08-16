@@ -2,7 +2,9 @@
 
 @param UrlsPage page
 
-@template.layout.page(content = @`
+@template.layout.page(
+page = page,
+content = @`
     <section class="p-10">
         <h1 class="text-5xl mb-4">Сайты</h1>
 
@@ -22,11 +24,19 @@
                         <th class="w-4/8 border border-gray-400 p-2">
                             <a href="/urls/${url.getId()}" class="underline text-blue-400">${url.getName()}</a>
                         </th>
-                        <th class="w-2/8 border border-gray-400 p-2"></th>
-                        <th class="w-1/8 border border-gray-400 p-2"></th>
+                        <th class="w-2/8 border border-gray-400 p-2">
+                            @if(page.getLatestChecks().get(url.getId()) != null)
+                                ${page.getLatestChecks().get(url.getId()).getCreatedAt().toString()}
+                            @endif
+                        </th>
+                        <th class="w-1/8 border border-gray-400 p-2">
+                            @if(page.getLatestChecks().get(url.getId()) != null)
+                                ${page.getLatestChecks().get(url.getId()).getStatusCode().toString()}
+                            @endif
+                        </th>
                     </tr>
                 @endfor
             </tbody>
         </table>
     </section>
-`, page = page)
+`)

@@ -16,11 +16,11 @@ public class UrlCheck {
     private Long urlId;
     private Timestamp createdAt;
 
-    public UrlCheck(Integer statusCode, String title, String h1, String description, Long urlId) {
-        this.statusCode = statusCode;
-        this.title = title;
-        this.h1 = h1;
-        this.description = description;
-        this.urlId = urlId;
+    public UrlCheck(Integer newStatusCode, String newTitle, String newH1, String newDescription, Long newUrlId) {
+        this.statusCode = newStatusCode;
+        this.title = newTitle;
+        this.h1 = newH1;
+        this.description = newDescription;
+        this.urlId = newUrlId;
     }
 }
