@@ -1,3 +1,7 @@
+@import hexlet.code.dto.BasePage
+
+@param BasePage page
+
 @template.layout.page(content = @`
     <section class="bg-gray-700 p-10">
         <header class="max-w-4xl m-auto">
@@ -14,4 +18,4 @@
             <p class="text-gray-400 text-base">Пример: https://www.example.com</p>
         </form>
     </section>
-`)
+`, page = page)

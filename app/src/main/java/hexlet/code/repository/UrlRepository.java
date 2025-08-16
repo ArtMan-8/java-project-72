@@ -26,6 +26,7 @@ public class UrlRepository extends BaseRepository {
                 url.setCreatedAt(resultSet.getTimestamp("created_at"));
                 urls.add(url);
             }
+
             return urls;
         } catch (SQLException error) {
             throw new SQLException("Ошибка получения списка URL", error);

@@ -18,7 +18,6 @@ import io.javalin.rendering.template.JavalinJte;
 
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
-
 import hexlet.code.util.NamedRoutes;
 import hexlet.code.controller.RootController;
 import hexlet.code.controller.UrlsController;

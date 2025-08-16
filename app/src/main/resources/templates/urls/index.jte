@@ -1,4 +1,4 @@
-@import hexlet.code.dto.urls.UrlsPage
+@import hexlet.code.dto.UrlsPage
 
 @param UrlsPage page
 
@@ -29,4 +29,4 @@
             </tbody>
         </table>
     </section>
-`)
+`, page = page)
