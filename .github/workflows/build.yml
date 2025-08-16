@@ -18,19 +18,21 @@ jobs:
         with:
           gradle-version: "8.12"
 
-      - name: Build and test
-        run: make test-report
-
-      - uses: qltysh/qlty-action/coverage@main
+      - name: Cache SonarQube packages
+        uses: actions/cache@v4
         with:
-          coverage-token: ${{ secrets.QLTY_COVERAGE_TOKEN }}
-          files: app/build/reports/jacoco/test/jacocoTestReport.xml
-          add-prefix: app/src/main/java/
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
         with:
-          file: app/build/reports/jacoco/test/jacocoTestReport.xml
-          flags: unittests
-          name: codecov-umbrella
-          fail_ci_if_error: false
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: ${{ runner.os }}-gradle
+
+      - name: Build and analyze
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: make sonar

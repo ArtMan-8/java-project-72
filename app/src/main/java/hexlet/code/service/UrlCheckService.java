@@ -4,16 +4,21 @@ import hexlet.code.model.UrlCheck;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
-
-import java.io.IOException;
+import kong.unirest.core.HttpResponse;
+import kong.unirest.core.Unirest;
+import kong.unirest.core.UnirestException;
 
 public class UrlCheckService {
-    public static UrlCheck checkUrl(String url) throws IOException {
+    public static UrlCheck checkUrl(String url) throws UnirestException {
         try {
-            Document doc = Jsoup.connect(url)
-                .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
-                .timeout(10000)
-                .get();
+            HttpResponse<String> response = Unirest.get(url)
+                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36")
+                .asString();
+
+            int statusCode = response.getStatus();
+            String html = response.getBody();
+
+            Document doc = Jsoup.parse(html, url);
 
             String title = doc.title();
             String h1 = "";
@@ -29,9 +34,8 @@ public class UrlCheckService {
                 description = metaDescription.attr("content");
             }
 
-            return new UrlCheck(200, title, h1, description, null);
-        } catch (IOException e) {
-            // В случае ошибки возвращаем проверку с кодом ошибки
+            return new UrlCheck(statusCode, title, h1, description, null);
+        } catch (UnirestException e) {
             return new UrlCheck(500, "", "", "Ошибка подключения: " + e.getMessage(), null);
         }
     }

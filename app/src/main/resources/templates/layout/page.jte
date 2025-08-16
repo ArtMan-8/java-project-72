@@ -71,13 +71,11 @@
     </footer>
 
     <script>
-        // Функция для закрытия flash сообщения
         function closeFlashMessage() {
             const flashContainer = document.getElementById('flash-container');
             flashContainer.style.display = 'none';
         }
 
-        // Добавляем обработчик для закрытия по клику на сообщение
         document.addEventListener('DOMContentLoaded', function() {
             const flashMessage = document.getElementById('flash-message');
             if (flashMessage) {

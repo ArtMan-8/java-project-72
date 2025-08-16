@@ -1,6 +1,6 @@
 ### Hexlet tests and linter status:
 
-[![Actions Status](https://github.com/ArtMan-8/java-project-72/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/ArtMan-8/java-project-72/actions) [![Maintainability](https://qlty.sh/badges/8a8510ba-a16e-49a6-b29c-78a56ae240e3/maintainability.svg)](https://qlty.sh/gh/ArtMan-8/projects/java-project-72) [![Code Coverage](https://qlty.sh/badges/8a8510ba-a16e-49a6-b29c-78a56ae240e3/test_coverage.svg)](https://qlty.sh/gh/ArtMan-8/projects/java-project-72)
+[![Actions Status](https://github.com/ArtMan-8/java-project-72/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/ArtMan-8/java-project-72/actions) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ArtMan-8_java-project-72&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=ArtMan-8_java-project-72)
 
 <hr />
 

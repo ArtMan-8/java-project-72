@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import hexlet.code.dto.BasePage;
 
 public final class RootControllerTest {
-
     @Test
     void testBasePageCreation() {
         var page = new BasePage();

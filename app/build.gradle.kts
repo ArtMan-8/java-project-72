@@ -16,6 +16,7 @@ plugins {
     id("io.freefair.lombok") version "8.13.1"
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("com.github.ben-manes.versions") version "0.52.0"
+    id("org.sonarqube") version "6.2.0.5505"
 }
 
 dependencies {
@@ -48,4 +49,11 @@ tasks.jacocoTestReport {
         xml.required.set(true)
         html.required.set(true)
     }
+}
+
+sonar {
+  properties {
+    property("sonar.projectKey", "ArtMan-8_java-project-72")
+    property("sonar.organization", "artman-8")
+  }
 }

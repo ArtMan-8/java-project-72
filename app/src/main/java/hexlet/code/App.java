@@ -84,12 +84,14 @@ public class App {
     }
 
     private static TemplateEngine createTemplateEngine() {
-        Path path = Path.of("app", "src", "main", "resources", "templates");
+        Path path = Path.of("src", "main", "resources", "templates");
         DirectoryCodeResolver codeResolver = new DirectoryCodeResolver(path);
         TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
 
-        DirectoryWatcher watcher = new DirectoryWatcher(templateEngine, codeResolver);
-        watcher.start(templates -> { });
+        if (System.getenv("CI") == null) {
+            DirectoryWatcher watcher = new DirectoryWatcher(templateEngine, codeResolver);
+            watcher.start(templates -> { });
+        }
 
         return templateEngine;
     }

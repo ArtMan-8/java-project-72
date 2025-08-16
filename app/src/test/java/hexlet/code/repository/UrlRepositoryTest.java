@@ -40,7 +40,6 @@ public final class UrlRepositoryTest {
             var url = new Url("https://example.com");
             UrlRepository.save(url);
 
-            // Проверяем, что URL был сохранен
             var savedUrl = UrlRepository.findByName("https://example.com");
             assertTrue(savedUrl.isPresent());
             assertEquals("https://example.com", savedUrl.get().getName());

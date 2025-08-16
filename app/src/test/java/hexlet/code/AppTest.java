@@ -77,7 +77,6 @@ public final class AppTest {
                  Statement stmt = connection.createStatement()) {
                 stmt.executeUpdate("INSERT INTO urls (name) VALUES ('https://test.com')");
 
-                // Попытка вставить дубликат должна вызвать исключение
                 assertThrows(SQLException.class, () -> {
                     stmt.executeUpdate("INSERT INTO urls (name) VALUES ('https://test.com')");
                 });

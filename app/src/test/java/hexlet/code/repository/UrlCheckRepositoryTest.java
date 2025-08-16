@@ -45,7 +45,6 @@ class UrlCheckRepositoryTest {
 
     @Test
     void testSaveAndFindByUrlId() throws SQLException {
-        // Создаем тестовый URL
         String insertUrlSql = "INSERT INTO urls (name) VALUES (?)";
         Long urlId;
 
@@ -59,14 +58,11 @@ class UrlCheckRepositoryTest {
             urlId = resultSet.getLong(1);
         }
 
-        // Создаем тестовую проверку
         var urlCheck = new UrlCheck(200, "Test Title", "Test H1", "Test Description", urlId);
         UrlCheckRepository.save(urlCheck);
 
-        // Проверяем, что проверка сохранена
         assertThat(urlCheck.getId()).isNotNull();
 
-        // Получаем проверки по URL ID
         List<UrlCheck> checks = UrlCheckRepository.findByUrlId(urlId);
         assertThat(checks).hasSize(1);
 
@@ -79,7 +75,6 @@ class UrlCheckRepositoryTest {
 
     @Test
     void testFindLatestByUrlId() throws SQLException {
-        // Создаем тестовый URL
         String insertUrlSql = "INSERT INTO urls (name) VALUES (?)";
         Long urlId;
 
@@ -93,19 +88,17 @@ class UrlCheckRepositoryTest {
             urlId = resultSet.getLong(1);
         }
 
-        // Создаем две проверки
         var firstCheck = new UrlCheck(200, "First Title", "First H1", "First Description", urlId);
         var secondCheck = new UrlCheck(404, "Second Title", "Second H1", "Second Description", urlId);
 
         UrlCheckRepository.save(firstCheck);
         try {
-            Thread.sleep(100); // Небольшая задержка для разницы во времени
+            Thread.sleep(100);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
         UrlCheckRepository.save(secondCheck);
 
-        // Получаем последнюю проверку
         Optional<UrlCheck> latestCheck = UrlCheckRepository.findLatestByUrlId(urlId);
         assertThat(latestCheck).isPresent();
         assertThat(latestCheck.get().getStatusCode()).isEqualTo(404);

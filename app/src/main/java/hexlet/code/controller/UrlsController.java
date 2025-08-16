@@ -7,7 +7,6 @@ import static io.javalin.rendering.template.TemplateUtil.model;
 import java.net.URI;
 import java.net.URL;
 import java.sql.SQLException;
-import java.io.IOException;
 
 import hexlet.code.dto.UrlPage;
 import hexlet.code.dto.UrlsPage;
@@ -18,6 +17,7 @@ import hexlet.code.service.UrlCheckService;
 import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.util.FlashMessages;
 import hexlet.code.util.NamedRoutes;
+import kong.unirest.core.UnirestException;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -114,7 +114,7 @@ public class UrlsController {
 
             ctx.sessionAttribute(FlashMessages.MESSAGE_KEY, FlashMessages.URL_CHECK_SUCCESS);
             ctx.sessionAttribute(FlashMessages.TYPE_KEY, FlashMessages.SUCCESS);
-        } catch (IOException error) {
+        } catch (UnirestException error) {
             var urlCheck = new UrlCheck(500, "", "", "Ошибка подключения: " + error.getMessage(), Long.valueOf(urlId));
             UrlCheckRepository.save(urlCheck);
 
