@@ -29,6 +29,8 @@ dependencies {
     implementation("org.postgresql:postgresql:42.7.7")
 
     testImplementation("org.junit.jupiter:junit-jupiter:5.12.0")
+    testImplementation("org.assertj:assertj-core:3.24.2")
+    testImplementation("com.h2database:h2:2.3.232")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
