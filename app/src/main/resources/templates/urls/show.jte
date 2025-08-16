@@ -34,9 +34,11 @@
             
             <!-- Кнопка запуска проверки -->
             <div class="mb-6">
-                <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                    Запустить проверку
-                </button>
+                <form method="post" action="/urls/${page.getUrl().getId().toString()}/checks">
+                    <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                        Запустить проверку
+                    </button>
+                </form>
             </div>
 
             <!-- Таблица проверок -->

@@ -85,4 +85,26 @@ public class UrlsController {
             ctx.redirect(NamedRoutes.rootPath());
         }
     }
+
+    public static void check(Context ctx) throws SQLException {
+        var urlId = ctx.pathParamAsClass("id", String.class).get();
+        var url = UrlRepository.findById(Long.valueOf(urlId));
+
+        if (url.isEmpty()) {
+            throw new NotFoundResponse("Url with id=" + urlId + " not found");
+        }
+
+        try {
+            // TODO: Здесь будет логика проверки сайта с использованием Unirest
+            // Пока создаем заглушку для проверки
+            
+            ctx.sessionAttribute(FlashMassages.MESSAGE_KEY, FlashMassages.URL_CHECK_SUCCESS);
+            ctx.sessionAttribute(FlashMassages.TYPE_KEY, FlashMassages.SUCCESS);
+        } catch (Exception error) {
+            ctx.sessionAttribute(FlashMassages.MESSAGE_KEY, FlashMassages.URL_CHECK_ERROR);
+            ctx.sessionAttribute(FlashMassages.TYPE_KEY, FlashMassages.ERROR);
+        }
+
+        ctx.redirect(NamedRoutes.urlPath(urlId));
+    }
 }

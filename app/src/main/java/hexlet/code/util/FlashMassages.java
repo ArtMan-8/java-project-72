@@ -17,6 +17,8 @@ public class FlashMassages {
     public static final String URL_EMPTY = "URL не может быть пустым";
     public static final String URL_ERROR = "Ошибка при добавлении страницы";
     public static final String URL_INVALID = "Некорректный URL";
+    public static final String URL_CHECK_SUCCESS = "Сайт успешно проверен";
+    public static final String URL_CHECK_ERROR = "Ошибка при проверке сайта";
 
     public static void clearFlashMessages(Context ctx) {
         ctx.sessionAttribute(MESSAGE_KEY, null);
