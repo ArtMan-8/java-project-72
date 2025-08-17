@@ -4,7 +4,7 @@ import static io.javalin.rendering.template.TemplateUtil.model;
 import io.javalin.http.Context;
 
 import hexlet.code.dto.BasePage;
-import hexlet.code.util.FlashMessages;
+import hexlet.code.utils.FlashMessages;
 
 public class RootController {
     public static void index(Context ctx) {

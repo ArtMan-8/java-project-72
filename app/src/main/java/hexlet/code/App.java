@@ -1,6 +1,5 @@
 package hexlet.code;
 
-import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.stream.Collectors;
@@ -10,18 +9,17 @@ import java.io.InputStreamReader;
 
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
-import gg.jte.resolve.DirectoryCodeResolver;
-import gg.jte.watcher.DirectoryWatcher;
-
+import gg.jte.resolve.ResourceCodeResolver;
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinJte;
 
 import com.zaxxer.hikari.HikariDataSource;
 import lombok.extern.slf4j.Slf4j;
-import hexlet.code.util.NamedRoutes;
 import hexlet.code.controller.RootController;
 import hexlet.code.controller.UrlsController;
+import hexlet.code.controller.UrlCheckController;
 import hexlet.code.repository.BaseRepository;
+import hexlet.code.utils.NamedRoutes;
 
 @Slf4j
 public class App {
@@ -46,7 +44,7 @@ public class App {
 
         app.get(NamedRoutes.urlPath("{id}"), UrlsController::show);
 
-        app.post(NamedRoutes.urlChecksPath("{id}"), UrlsController::check);
+        app.post(NamedRoutes.urlChecksPath("{id}"), UrlCheckController::check);
 
         return app;
     }
@@ -84,15 +82,9 @@ public class App {
     }
 
     private static TemplateEngine createTemplateEngine() {
-        Path path = Path.of("src", "main", "resources", "templates");
-        DirectoryCodeResolver codeResolver = new DirectoryCodeResolver(path);
+        ClassLoader classLoader = App.class.getClassLoader();
+        ResourceCodeResolver codeResolver = new ResourceCodeResolver("templates", classLoader);
         TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
-
-        if (System.getenv("CI") == null) {
-            DirectoryWatcher watcher = new DirectoryWatcher(templateEngine, codeResolver);
-            watcher.start(templates -> { });
-        }
-
         return templateEngine;
     }
 }

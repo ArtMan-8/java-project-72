@@ -13,11 +13,9 @@ import hexlet.code.dto.UrlsPage;
 import hexlet.code.model.Url;
 import hexlet.code.model.UrlCheck;
 import hexlet.code.repository.UrlRepository;
-import hexlet.code.service.UrlCheckService;
+import hexlet.code.utils.FlashMessages;
+import hexlet.code.utils.NamedRoutes;
 import hexlet.code.repository.UrlCheckRepository;
-import hexlet.code.util.FlashMessages;
-import hexlet.code.util.NamedRoutes;
-import kong.unirest.core.UnirestException;
 
 import java.util.Map;
 import java.util.HashMap;
@@ -97,34 +95,5 @@ public class UrlsController {
             ctx.sessionAttribute(FlashMessages.TYPE_KEY, FlashMessages.ERROR);
             ctx.redirect(NamedRoutes.rootPath());
         }
-    }
-
-    public static void check(Context ctx) throws SQLException {
-        var urlId = ctx.pathParamAsClass("id", String.class).get();
-        var url = UrlRepository.findById(Long.valueOf(urlId));
-
-        if (url.isEmpty()) {
-            throw new NotFoundResponse("Url with id=" + urlId + " not found");
-        }
-
-        try {
-            var urlCheck = UrlCheckService.checkUrl(url.get().getName());
-            urlCheck.setUrlId(Long.valueOf(urlId));
-            UrlCheckRepository.save(urlCheck);
-
-            ctx.sessionAttribute(FlashMessages.MESSAGE_KEY, FlashMessages.URL_CHECK_SUCCESS);
-            ctx.sessionAttribute(FlashMessages.TYPE_KEY, FlashMessages.SUCCESS);
-        } catch (UnirestException error) {
-            var urlCheck = new UrlCheck(500, "", "", "Ошибка подключения: " + error.getMessage(), Long.valueOf(urlId));
-            UrlCheckRepository.save(urlCheck);
-
-            ctx.sessionAttribute(FlashMessages.MESSAGE_KEY, FlashMessages.URL_CHECK_ERROR);
-            ctx.sessionAttribute(FlashMessages.TYPE_KEY, FlashMessages.ERROR);
-        } catch (Exception error) {
-            ctx.sessionAttribute(FlashMessages.MESSAGE_KEY, FlashMessages.URL_CHECK_ERROR);
-            ctx.sessionAttribute(FlashMessages.TYPE_KEY, FlashMessages.ERROR);
-        }
-
-        ctx.redirect(NamedRoutes.urlPath(urlId));
     }
 }

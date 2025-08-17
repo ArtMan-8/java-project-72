@@ -1,94 +1,99 @@
 package hexlet.code;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.stream.Collectors;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.SQLException;
 
-import com.zaxxer.hikari.HikariDataSource;
-import hexlet.code.repository.BaseRepository;
+import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public final class AppTest {
-    private HikariDataSource dataSource;
+import hexlet.code.model.Url;
+import hexlet.code.repository.UrlRepository;
+import hexlet.code.utils.NamedRoutes;
+import io.javalin.Javalin;
+import io.javalin.testtools.JavalinTest;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 
-    @BeforeAll
-    void setUp() throws SQLException, IOException {
-        dataSource = new HikariDataSource();
-        dataSource.setJdbcUrl("jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;");
+public class AppTest {
+    private static Javalin app;
+    private static MockWebServer mockWebServer;
 
-        try (Connection connection = dataSource.getConnection()) {
-            connection.createStatement().execute(readSchemaDB());
-        }
+    @BeforeEach
+    public final void setup() throws IOException, SQLException {
+        app = App.getApp();
+        mockWebServer = new MockWebServer();
 
-        BaseRepository.setDataSource(dataSource);
+        Path htmlFixture = Paths.get("src/test/resources/fixtures/test-page.html")
+            .toAbsolutePath().normalize();
+        MockResponse response = new MockResponse()
+            .setBody(Files.readString(htmlFixture)).setResponseCode(200);
+
+        mockWebServer.enqueue(response);
+        mockWebServer.start();
+    }
+
+    @AfterEach
+    public final void shutdown() throws IOException {
+        mockWebServer.shutdown();
     }
 
     @Test
-    void testDatabaseConnection() {
-        assertDoesNotThrow(() -> {
-            try (Connection connection = dataSource.getConnection()) {
-                assertTrue(connection.isValid(1));
-            }
+    public void getRootPath() {
+        JavalinTest.test(app, (server, client) -> {
+            var response = client.get(NamedRoutes.rootPath());
+            assertThat(response.code()).isEqualTo(200);
+            assertThat(response.body().string()).contains("Title");
         });
     }
 
     @Test
-    void testSchemaCreation() {
-        assertDoesNotThrow(() -> {
-            try (Connection connection = dataSource.getConnection();
-                 Statement stmt = connection.createStatement()) {
-                var rs = stmt.executeQuery("SELECT COUNT(*) FROM urls");
-                assertTrue(rs.next());
-                assertEquals(0, rs.getInt(1));
-            }
+    public void getUrlsPath() {
+        JavalinTest.test(app, (server, client) -> {
+            var response = client.get(NamedRoutes.urlsPath());
+            assertThat(response.code()).isEqualTo(200);
         });
     }
 
     @Test
-    void testUrlInsertion() {
-        assertDoesNotThrow(() -> {
-            try (Connection connection = dataSource.getConnection();
-                 Statement stmt = connection.createStatement()) {
-                stmt.executeUpdate("INSERT INTO urls (name) VALUES ('https://example.com')");
+    public void getUrlChecksPath() {
+        JavalinTest.test(app, (server, client) -> {
+            var url = "https://www.example.com";
 
-                var rs = stmt.executeQuery("SELECT COUNT(*) FROM urls WHERE name = 'https://example.com'");
-                assertTrue(rs.next());
-                assertEquals(1, rs.getInt(1));
-            }
+            var response = client.post(NamedRoutes.urlsPath(), url);
+            assertThat(response.code()).isEqualTo(200);
+            assertThat(response.body().string()).contains("https://www.example.com");
+            assertThat(UrlRepository.findByName(url)).isNotNull();
         });
     }
 
     @Test
-    void testUrlUniqueness() {
-        assertDoesNotThrow(() -> {
-            try (Connection connection = dataSource.getConnection();
-                 Statement stmt = connection.createStatement()) {
-                stmt.executeUpdate("INSERT INTO urls (name) VALUES ('https://test.com')");
+    public void getUrlPath() {
+        JavalinTest.test(app, (server, client) -> {
+            var url = new Url("https://example.com");
+            UrlRepository.save(url);
 
-                assertThrows(SQLException.class, () -> {
-                    stmt.executeUpdate("INSERT INTO urls (name) VALUES ('https://test.com')");
-                });
-            }
+            var response = client.get(NamedRoutes.urlPath(url.getId()));
+            assertThat(response.code()).isEqualTo(200);
+            assertThat(response.body().string()).contains("https://example.com");
         });
     }
 
-    private String readSchemaDB() throws IOException {
-        try (var stream = AppTest.class.getResourceAsStream("/schema.sql")) {
-            return new BufferedReader(new InputStreamReader(stream))
-                .lines()
-                .collect(Collectors.joining());
-        }
+    @Test
+    public void postUrlChecksPath() {
+        JavalinTest.test(app, (server, client) -> {
+            var url = new Url("https://example.com");
+            UrlRepository.save(url);
+
+            var response = client.post(NamedRoutes.urlChecksPath(String.valueOf(url.getId())));
+            assertThat(response.code()).isEqualTo(200);
+            assertThat(response.body().string()).contains("https://example.com");
+            assertThat(UrlRepository.findById(url.getId())).isNotNull();
+        });
     }
 }

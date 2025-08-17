@@ -1,4 +1,4 @@
-package hexlet.code.util;
+package hexlet.code.utils;
 
 import io.javalin.http.Context;
 import hexlet.code.dto.BasePage;
