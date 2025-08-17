@@ -33,8 +33,10 @@ dependencies {
 
     testImplementation("com.h2database:h2:2.3.232")
     testImplementation("com.squareup.okhttp3:mockwebserver:5.1.0")
+    testImplementation("io.javalin:javalin-testtools:6.5.0")
     testImplementation("org.junit.jupiter:junit-jupiter:5.12.0")
     testImplementation("org.assertj:assertj-core:3.24.2")
+
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 

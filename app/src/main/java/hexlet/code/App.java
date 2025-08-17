@@ -1,18 +1,18 @@
 package hexlet.code;
 
-import java.nio.file.Path;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.stream.Collectors;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Path;
 
 import gg.jte.ContentType;
 import gg.jte.TemplateEngine;
 import gg.jte.resolve.DirectoryCodeResolver;
+import gg.jte.resolve.ResourceCodeResolver;
 import gg.jte.watcher.DirectoryWatcher;
-
 import io.javalin.Javalin;
 import io.javalin.rendering.template.JavalinJte;
 
@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import hexlet.code.util.NamedRoutes;
 import hexlet.code.controller.RootController;
 import hexlet.code.controller.UrlsController;
+import hexlet.code.controller.UrlCheckController;
 import hexlet.code.repository.BaseRepository;
 
 @Slf4j
@@ -46,7 +47,7 @@ public class App {
 
         app.get(NamedRoutes.urlPath("{id}"), UrlsController::show);
 
-        app.post(NamedRoutes.urlChecksPath("{id}"), UrlsController::check);
+        app.post(NamedRoutes.urlChecksPath("{id}"), UrlCheckController::check);
 
         return app;
     }
@@ -84,11 +85,17 @@ public class App {
     }
 
     private static TemplateEngine createTemplateEngine() {
-        Path path = Path.of("src", "main", "resources", "templates");
-        DirectoryCodeResolver codeResolver = new DirectoryCodeResolver(path);
-        TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
+        TemplateEngine templateEngine;
 
-        if (System.getenv("CI") == null) {
+        if (System.getenv("CI") != null || System.getenv("PRODUCTION") != null) {
+            ClassLoader classLoader = App.class.getClassLoader();
+            var codeResolver = new ResourceCodeResolver("templates", classLoader);
+            templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
+        } else {
+            Path templatesPath = Path.of("src", "main", "resources", "templates");
+            var codeResolver = new DirectoryCodeResolver(templatesPath);
+            templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
+
             DirectoryWatcher watcher = new DirectoryWatcher(templateEngine, codeResolver);
             watcher.start(templates -> { });
         }
