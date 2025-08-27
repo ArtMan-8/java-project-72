@@ -6,6 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +24,7 @@ public class UrlRepository extends BaseRepository {
             while (resultSet.next()) {
                 Url url = new Url(resultSet.getString("name"));
                 url.setId(resultSet.getLong("id"));
-                url.setCreatedAt(resultSet.getTimestamp("created_at"));
+                url.setCreatedAt(resultSet.getTimestamp("created_at").toInstant());
                 urls.add(url);
             }
 
@@ -39,7 +40,7 @@ public class UrlRepository extends BaseRepository {
 
             PreparedStatement statement = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             statement.setString(1, url.getName());
-            statement.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+            statement.setTimestamp(2, Timestamp.from(Instant.now()));
             statement.executeUpdate();
 
             ResultSet resultSet = statement.getGeneratedKeys();
@@ -61,7 +62,7 @@ public class UrlRepository extends BaseRepository {
             if (resultSet.next()) {
                 Url foundUrl = new Url(resultSet.getString("name"));
                 foundUrl.setId(resultSet.getLong("id"));
-                foundUrl.setCreatedAt(resultSet.getTimestamp("created_at"));
+                foundUrl.setCreatedAt(resultSet.getTimestamp("created_at").toInstant());
                 return Optional.of(foundUrl);
             }
 
@@ -81,7 +82,7 @@ public class UrlRepository extends BaseRepository {
             if (resultSet.next()) {
                 Url foundUrl = new Url(resultSet.getString("name"));
                 foundUrl.setId(resultSet.getLong("id"));
-                foundUrl.setCreatedAt(resultSet.getTimestamp("created_at"));
+                foundUrl.setCreatedAt(resultSet.getTimestamp("created_at").toInstant());
                 return Optional.of(foundUrl);
             }
 

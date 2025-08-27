@@ -6,8 +6,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import hexlet.code.model.UrlCheck;
@@ -24,7 +27,7 @@ public class UrlCheckRepository extends BaseRepository {
             statement.setString(3, urlCheck.getH1());
             statement.setString(4, urlCheck.getTitle());
             statement.setString(5, urlCheck.getDescription());
-            statement.setTimestamp(6, new Timestamp(System.currentTimeMillis()));
+            statement.setTimestamp(6, Timestamp.from(Instant.now()));
             statement.executeUpdate();
 
             ResultSet resultSet = statement.getGeneratedKeys();
@@ -53,8 +56,9 @@ public class UrlCheckRepository extends BaseRepository {
                     resultSet.getString("description"),
                     resultSet.getLong("url_id")
                 );
+
                 check.setId(resultSet.getLong("id"));
-                check.setCreatedAt(resultSet.getTimestamp("created_at"));
+                check.setCreatedAt(resultSet.getTimestamp("created_at").toInstant());
                 checks.add(check);
             }
 
@@ -80,13 +84,39 @@ public class UrlCheckRepository extends BaseRepository {
                     resultSet.getLong("url_id")
                 );
                 check.setId(resultSet.getLong("id"));
-                check.setCreatedAt(resultSet.getTimestamp("created_at"));
+                check.setCreatedAt(resultSet.getTimestamp("created_at").toInstant());
                 return Optional.of(check);
             }
 
             return Optional.empty();
         } catch (SQLException error) {
             throw new SQLException("Ошибка получения последней проверки URL", error);
+        }
+    }
+
+    public static Map<Long, UrlCheck> findLatestChecks() throws SQLException {
+        try (Connection connection = BaseRepository.getDataSource().getConnection()) {
+            String sql = "SELECT DISTINCT ON (url_id) * FROM url_checks ORDER BY url_id, created_at DESC";
+            PreparedStatement statement = connection.prepareStatement(sql);
+            ResultSet resultSet = statement.executeQuery();
+            Map<Long, UrlCheck> checks = new HashMap<>();
+
+            while (resultSet.next()) {
+                UrlCheck check = new UrlCheck(
+                    resultSet.getInt("status_code"),
+                    resultSet.getString("title"),
+                    resultSet.getString("h1"),
+                    resultSet.getString("description"),
+                    resultSet.getLong("url_id")
+                );
+                check.setId(resultSet.getLong("id"));
+                check.setCreatedAt(resultSet.getTimestamp("created_at").toInstant());
+                checks.put(check.getUrlId(), check);
+            }
+
+            return checks;
+        } catch (SQLException error) {
+            throw new SQLException("Ошибка получения последних проверок URL", error);
         }
     }
 }

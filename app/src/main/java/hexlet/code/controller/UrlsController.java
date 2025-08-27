@@ -18,17 +18,11 @@ import hexlet.code.utils.NamedRoutes;
 import hexlet.code.repository.UrlCheckRepository;
 
 import java.util.Map;
-import java.util.HashMap;
 
 public class UrlsController {
     public static void index(Context ctx) throws SQLException {
         var urls = UrlRepository.getEntities();
-        Map<Long, UrlCheck> latestChecks = new HashMap<>();
-
-        for (var url : urls) {
-            var latestCheck = UrlCheckRepository.findLatestByUrlId(url.getId());
-            latestChecks.put(url.getId(), latestCheck.orElse(null));
-        }
+        Map<Long, UrlCheck> latestChecks = UrlCheckRepository.findLatestChecks();
 
         var page = new UrlsPage(urls, latestChecks);
         FlashMessages.setFlashToPage(ctx, page);
@@ -37,18 +31,13 @@ public class UrlsController {
 
     public static void show(Context ctx) throws SQLException {
         var urlId = ctx.pathParamAsClass("id", String.class).get();
-        var url = UrlRepository.findById(Long.valueOf(urlId));
+        var url = UrlRepository.findById(Long.valueOf(urlId))
+            .orElseThrow(() -> new NotFoundResponse("Url with id=" + urlId + " not found"));
+        var checks = UrlCheckRepository.findByUrlId(Long.valueOf(urlId));
+        var page = new UrlPage(url, checks);
 
-        if (url.isPresent()) {
-            var checks = UrlCheckRepository.findByUrlId(Long.valueOf(urlId));
-            var page = new UrlPage(url.get(), checks);
-
-            FlashMessages.setFlashToPage(ctx, page);
-
-            ctx.render("urls/show.jte", model("page", page));
-        } else {
-            throw new NotFoundResponse("Url with id=" + urlId + " not found");
-        }
+        FlashMessages.setFlashToPage(ctx, page);
+        ctx.render("urls/show.jte", model("page", page));
     }
 
     public static void create(Context ctx) throws SQLException {
@@ -77,8 +66,8 @@ public class UrlsController {
                 domainWithProtocol += ":" + url.getPort();
             }
 
-            var existingUrl = UrlRepository.findByName(domainWithProtocol);
-            if (existingUrl.isPresent()) {
+            var existingUrl = UrlRepository.findByName(domainWithProtocol).orElse(null);
+            if (existingUrl != null) {
                 ctx.sessionAttribute(FlashMessages.MESSAGE_KEY, FlashMessages.URL_ALREADY_EXISTS);
                 ctx.sessionAttribute(FlashMessages.TYPE_KEY, FlashMessages.INFO);
                 ctx.redirect(NamedRoutes.urlsPath());

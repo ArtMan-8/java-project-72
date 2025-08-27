@@ -23,7 +23,7 @@ content = @`
                         <th class="w-1/4 border border-gray-400 p-2 bg-gray-100 text-left">Дата создания</th>
                         <td class="w-3/4 border border-gray-400 p-2">
                             @if(page.getUrl().getCreatedAt() != null)
-                                ${page.getUrl().getCreatedAt().toLocalDateTime().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))}
+                                ${page.getUrl().getCreatedAt().atZone(java.time.ZoneId.systemDefault()).format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))}
                             @endif
                         </td>
                     </tr>
@@ -72,7 +72,7 @@ content = @`
                                 <td class="border border-gray-400 p-2">${check.getDescription()}</td>
                                 <td class="border border-gray-400 p-2">
                                     @if(check.getCreatedAt() != null)
-                                        ${check.getCreatedAt().toLocalDateTime().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))}
+                                        ${check.getCreatedAt().atZone(java.time.ZoneId.systemDefault()).format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))}
                                     @endif
                                 </td>
                             </tr>

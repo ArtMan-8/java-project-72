@@ -1,6 +1,6 @@
 package hexlet.code.model;
 
-import java.sql.Timestamp;
+import java.time.Instant;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +14,7 @@ public class UrlCheck {
     private String h1;
     private String description;
     private Long urlId;
-    private Timestamp createdAt;
+    private Instant createdAt;
 
     public UrlCheck(Integer newStatusCode, String newTitle, String newH1, String newDescription, Long newUrlId) {
         this.statusCode = newStatusCode;

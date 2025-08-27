@@ -13,6 +13,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
 import hexlet.code.model.Url;
+import hexlet.code.model.UrlCheck;
+import hexlet.code.repository.UrlCheckRepository;
 import hexlet.code.repository.UrlRepository;
 import hexlet.code.utils.NamedRoutes;
 import io.javalin.Javalin;
@@ -85,7 +87,7 @@ public class AppTest {
     }
 
     @Test
-    public void postUrlChecksPath() {
+    public void postUrlChecksPath() throws SQLException {
         JavalinTest.test(app, (server, client) -> {
             var url = new Url("https://example.com");
             UrlRepository.save(url);
@@ -93,7 +95,11 @@ public class AppTest {
             var response = client.post(NamedRoutes.urlChecksPath(String.valueOf(url.getId())));
             assertThat(response.code()).isEqualTo(200);
             assertThat(response.body().string()).contains("https://example.com");
-            assertThat(UrlRepository.findById(url.getId())).isNotNull();
+
+            UrlCheck urlCheck = UrlCheckRepository.findLatestByUrlId(url.getId()).orElseThrow();
+            assertThat(urlCheck.getH1()).isEqualTo("Title");
+            assertThat(urlCheck.getTitle()).isEqualTo("Head");
+            assertThat(urlCheck.getDescription()).isEqualTo("Description");
         });
     }
 }

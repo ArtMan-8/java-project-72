@@ -1,5 +1,3 @@
-.PHONY: build
-
 lint: # Проверить кодстайл
 	make -C app lint
 
