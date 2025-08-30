@@ -8,7 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.SQLException;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 
@@ -50,7 +50,7 @@ public class AppTest {
         JavalinTest.test(app, (server, client) -> {
             var response = client.get(NamedRoutes.rootPath());
             assertThat(response.code()).isEqualTo(200);
-            assertThat(response.body().string()).contains("Title");
+            assertThat(response.body().string()).contains("Анализатор страниц");
         });
     }
 
@@ -65,36 +65,38 @@ public class AppTest {
     @Test
     public void getUrlChecksPath() {
         JavalinTest.test(app, (server, client) -> {
-            var url = "https://www.example.com";
+            var mockUrl = mockWebServer.url("/").toString();
 
-            var response = client.post(NamedRoutes.urlsPath(), url);
+            var response = client.post(NamedRoutes.urlsPath(), mockUrl);
             assertThat(response.code()).isEqualTo(200);
-            assertThat(response.body().string()).contains("https://www.example.com");
-            assertThat(UrlRepository.findByName(url)).isNotNull();
+            assertThat(response.body().string()).contains("Анализатор страниц");
+            assertThat(UrlRepository.findByName(mockUrl)).isNotNull();
         });
     }
 
     @Test
     public void getUrlPath() {
         JavalinTest.test(app, (server, client) -> {
-            var url = new Url("https://example.com");
+            var mockUrl = mockWebServer.url("/").toString();
+            var url = new Url(mockUrl);
             UrlRepository.save(url);
 
             var response = client.get(NamedRoutes.urlPath(url.getId()));
             assertThat(response.code()).isEqualTo(200);
-            assertThat(response.body().string()).contains("https://example.com");
+            assertThat(response.body().string()).contains(mockUrl);
         });
     }
 
     @Test
     public void postUrlChecksPath() throws SQLException {
         JavalinTest.test(app, (server, client) -> {
-            var url = new Url("https://example.com");
+            var mockUrl = mockWebServer.url("/").toString();
+            var url = new Url(mockUrl);
             UrlRepository.save(url);
 
             var response = client.post(NamedRoutes.urlChecksPath(String.valueOf(url.getId())));
             assertThat(response.code()).isEqualTo(200);
-            assertThat(response.body().string()).contains("https://example.com");
+            assertThat(response.body().string()).contains(mockUrl);
 
             UrlCheck urlCheck = UrlCheckRepository.findLatestByUrlId(url.getId()).orElseThrow();
             assertThat(urlCheck.getH1()).isEqualTo("Title");
