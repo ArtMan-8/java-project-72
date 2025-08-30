@@ -2,6 +2,7 @@ package hexlet.code;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.stream.Collectors;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -59,10 +60,9 @@ public class App {
         HikariDataSource dataSource = new HikariDataSource();
         dataSource.setJdbcUrl(getDBUrl());
 
-        try (Connection connection = dataSource.getConnection()) {
-            connection.createStatement().execute(readSchemaDB());
-        } catch (SQLException error) {
-            throw new SQLException("Ошибка инициализации базы данных", error);
+        try (Connection connection = dataSource.getConnection();
+             Statement statement = connection.createStatement()) {
+            statement.execute(readSchemaDB());
         }
 
         BaseRepository.setDataSource(dataSource);
